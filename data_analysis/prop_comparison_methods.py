@@ -575,3 +575,126 @@ def get_prop_differences(df, prop = 'area', operation = 'subtract', devstage_com
             prop_diff_stat = pd.concat([prop_diff_stat, prop_diff_stat_stage_roi]).reset_index(drop = True)
             
     return([prop_diff, prop_diff_stat])
+
+def get_prop_diff_vs_dist_per_roi_per_stagePair(df, prop = 'area', operation = 'subtract', devstages = ['upcrawling', '4hAPF'], roi = 'outDV', fit_deg = 1, fit_param = 'dist_beta'):
+    
+    #alpha corresponds to index for T+ Delta T stage
+    #beta corresponds to index for T stage
+    
+    roi_df = df[df['region'] == roi]
+    
+    discs_alpha = np.unique(roi_df[roi_df['devstage'] == devstages[1]]['discName']) #discs for t+Delta_t stage
+    discs_beta = np.unique(roi_df[roi_df['devstage'] == devstages[0]]['discName'])  #discs for t stage
+
+    f_alpha_beta_df = pd.DataFrame()
+    
+    dists_orig = np.linspace(0,1,100)
+
+    for alpha in range(len(discs_alpha)):
+
+        disc_alpha = discs_alpha[alpha]
+        alpha_df = roi_df[roi_df['discName'] == disc_alpha]
+        alpha_df = alpha_df.sort_values(by = ['distanceFraction'])
+        dist_alpha = np.array(alpha_df['distanceFraction'].values)
+        #N_alpha = np.array(alpha_df['cumcount'].values)
+        prop_alpha = np.array(alpha_df[prop].values)
+
+        for beta in range(len(discs_beta)):
+
+            disc_beta = discs_beta[beta]
+            beta_df = roi_df[roi_df['discName'] == disc_beta]
+            beta_df = beta_df.sort_values(by = ['distanceFraction'])
+            #beta_df = beta_df[(beta_df['distanceFraction'] >= min(dist_alpha)) & (beta_df['distanceFraction'] <= max(dist_alpha))]
+            dist_beta = np.array(beta_df['distanceFraction'].values)
+            prop_beta = np.array(beta_df[prop].values)
+            #k_beta = np.array(beta_df['k_dist'].values)
+            #ref_pathlength_scaled_beta = np.array(beta_df['ref_pathlength_scaled'].values)
+            
+            #here we take average of prop_alpha in steps of N_beta
+            #prop_alpha_piecewise_averaged = get_piecewise_average(prop_alpha, N_alpha, N_beta)
+            [min_lim, max_lim] = [max(min(dist_alpha), min(dist_beta)), min(max(dist_alpha),max(dist_beta))]
+            dists = dists_orig[(dists_orig > min_lim) & (dists_orig < max_lim)]
+            prop_alpha_interpolated = piecewise_linear_interpolate(dists, dist_alpha, prop_alpha, manner = "linear")
+            prop_beta_interpolated = piecewise_linear_interpolate(dists, dist_beta, prop_beta, manner = "linear")
+
+            #removing any values which may not have been interpolated or averaged
+            #non_None_indexes = np.invert(np.isnan(prop_alpha_piecewise_averaged.astype(float)))
+            #prop_beta = prop_beta[non_None_indexes]
+            #prop_alpha_piecewise_averaged = prop_alpha_piecewise_averaged[non_None_indexes]
+            #N_beta = N_beta[non_None_indexes]
+            #k_beta = k_beta[non_None_indexes]
+            
+            if operation == 'subtract':
+                prop_diffs = prop_alpha_interpolated - prop_beta_interpolated
+            elif operation == 'divide':
+                prop_diffs = prop_alpha_interpolated/prop_beta_interpolated
+            elif operation == 'divide-sqrt':
+                prop_diffs = np.sqrt(prop_alpha_interpolated/prop_beta_interpolated)
+
+            f_alpha_beta = pd.DataFrame({'disc_combination':[disc_alpha + disc_beta]*len(prop_diffs),
+                                         'disc_alpha':[disc_alpha]*len(prop_diffs),
+                                         'disc_beta':[disc_beta]*len(prop_diffs),
+                                         'dist_beta':dists,
+                                         #'k_beta':k_beta,
+                                         #'ref_pathlength_scaled_beta':ref_pathlength_scaled_beta,
+                                         prop+'_diff':prop_diffs,
+                                         prop+'_beta':prop_beta_interpolated,
+                                        })
+            
+            #f_alpha_beta['prop_diff'] = f_alpha_beta['prop_diff'].astype(float)
+
+            f_alpha_beta_df = pd.concat([f_alpha_beta_df,f_alpha_beta]).reset_index(drop=True)
+
+    stat_df = f_alpha_beta_df.groupby('dist_beta').agg(['mean', 'std']).reset_index()
+    colnames = [x[0]+'_'+x[1] if x[0] != 'dist_beta' else x[0] for x in stat_df.columns]
+    stat_df.columns = colnames #removing multi-indexing
+
+    f_alpha_beta_df['roi'] = roi
+    stat_df['roi'] = roi
+    
+    f_alpha_beta_df['devstage_init'] = devstages[0]
+    stat_df['devstage_init'] = devstages[0]
+    
+    f_alpha_beta_df['devstage_final'] = devstages[1]
+    stat_df['devstage_final'] = devstages[1]
+
+    #######
+    #get fit line
+    coeffs = np.polyfit(stat_df[fit_param], stat_df[prop + '_diff_mean'], 
+                        #w = 1/stat_df[prop + '_diff_std'], 
+                        deg = fit_deg)
+    poly_obj = np.poly1d(coeffs)
+    stat_df['fit_'+prop+'_diff'] = poly_obj(stat_df[fit_param])
+    stat_df['fit_'+prop+'_coeffs'] = [coeffs]*len(stat_df)
+
+
+    return([f_alpha_beta_df, stat_df])
+
+def get_prop_diff_vs_dist(df, prop = 'area', operation = 'subtract', devstage_combinations = None, devstages = ['upcrawling','whitePupa','2hAPF','4hAPF'], rois = ['outDV', 'DV'], fit_deg = 1, fit_param = 'k_beta'):
+
+    if devstage_combinations is None:
+        devstage_combinations = pd.DataFrame({'devstage_init':devstages[0:len(devstages)-1], 'devstage_final':devstages[1:]})
+        
+    
+    prop_diff = pd.DataFrame()
+    prop_diff_stat = pd.DataFrame()
+    
+    for i in range(len(devstage_combinations)):
+
+        devstage_init = devstage_combinations.loc[i,'devstage_init']
+        devstage_final = devstage_combinations.loc[i,'devstage_final']
+
+        for roi in rois:
+            
+            [prop_diff_stage_roi, prop_diff_stat_stage_roi] =  get_prop_diff_vs_dist_per_roi_per_stagePair(df, prop = prop, operation = operation, devstages = [devstage_init, devstage_final], roi = roi, fit_deg = fit_deg)
+            prop_diff = pd.concat([prop_diff, prop_diff_stage_roi]).reset_index(drop = True)
+            prop_diff_stat = pd.concat([prop_diff_stat, prop_diff_stat_stage_roi]).reset_index(drop = True)
+            
+    return([prop_diff, prop_diff_stat])
+
+
+
+
+
+
+    
