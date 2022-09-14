@@ -214,7 +214,7 @@ for i in range(nb_iterations):
         shutil.rmtree('files/')
 
     print('$$$$$$$ Running openfpm $$$$$$$')
-    os.system("cd " + dirname + " && source ~/openfpm_vars && make && grid") #if this does not work then put /home/krishna/openfpm_vars
+    os.system("cd " + dirname + " && source ~/openfpm_vars && make && grid")
     print('$$$$ Exit OpenFPM $$$$')
     
     #rename the folder
