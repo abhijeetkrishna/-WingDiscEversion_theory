@@ -718,6 +718,7 @@ def get_fit_lambda(pos_vector, DV_present = True, volume_conservation = True,
                    theta_DV = 0, theta_max = np.pi/2,
                    lambda_anisotropic_obj = None, lambda_isotropic_obj = None,
                    inDV_lambda_anisotropic_obj = None, inDV_lambda_isotropic_obj = None,
+                   lambda_height_obj = None,
                   ):
     
     #theta_DV : the angle where the DV boundary ends. It should be 0 if DV is not present
@@ -773,10 +774,14 @@ def get_fit_lambda(pos_vector, DV_present = True, volume_conservation = True,
         #get lambda coefficients
         lambda_anisotropic = inDV_lambda_anisotropic_obj(abs_phi/theta_max) 
         lambda_isotropic = inDV_lambda_isotropic_obj(abs_phi/theta_max) 
+        
         lambda_thetaTheta = lambda_isotropic*(lambda_anisotropic**(-1))
         lambda_phiPhi = lambda_isotropic*lambda_anisotropic
-        lambda_rr = 1/((lambda_isotropic)**(2*nu))
-
+        if (lambda_height_obj is None) and (volume_conservation):
+            lambda_rr = 1/((lambda_isotropic)**(2*nu))
+        else:
+            lambda_height = lambda_height_obj(abs_phi/theta_max)
+            lambda_rr = lambda_height
         #get lambda tensor
         lambda_alpha = lambda_rr*np.tensordot(e_r, e_r, axes = 0) + lambda_thetaTheta*np.tensordot(e_theta, e_theta, axes = 0) + lambda_phiPhi*np.tensordot(e_phi, e_phi, axes = 0)
 
@@ -804,7 +809,11 @@ def get_fit_lambda(pos_vector, DV_present = True, volume_conservation = True,
         lambda_isotropic = lambda_isotropic_obj((theta - theta_DV/2)/(theta_max - theta_DV/2))
         lambda_thetaTheta = lambda_isotropic*lambda_anisotropic
         lambda_phiPhi = lambda_isotropic*(lambda_anisotropic**(-1))
-        lambda_rr = 1/((lambda_isotropic)**(2*nu))
+        if (lambda_height_obj is None) and (volume_conservation):
+            lambda_rr = 1/((lambda_isotropic)**(2*nu))
+        else:
+            lambda_height = lambda_height_obj(abs_phi/theta_max)
+            lambda_rr = lambda_height
         
         #get lambda tensor 
         lambda_alpha = lambda_rr*np.tensordot(e_r, e_r, axes = 0) + lambda_thetaTheta*np.tensordot(e_theta, e_theta, axes = 0) + lambda_phiPhi*np.tensordot(e_phi, e_phi, axes = 0)

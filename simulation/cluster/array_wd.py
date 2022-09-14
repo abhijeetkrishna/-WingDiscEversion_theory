@@ -28,15 +28,19 @@ var_dict = {
 	#'inDV_gradient':True,
 	#'inDV_isotropic':False,
 	'overwrite_old_simulation':True,
-    #'lambda_isotropic_coeffs' : [-0.1682,1.38], #Myo data
-    'lambda_isotropic_coeffs' : [-0.2792,1.432], #WT data
-    #'lambda_anisotropic_coeffs' : [-0.005645, 0.08389, 0.9954], #Myo data
-    'lambda_anisotropic_coeffs' : [-0.009308, 0.1376, 1.037], #WT data
-    #'inDV_lambda_isotropic_coeffs' : [-0.01954,1.028], #Myo data
-    'inDV_lambda_isotropic_coeffs' : [-0.06108,1.387], #WT data
-    #'inDV_lambda_anisotropic_coeffs' : [0.0007879, -0.1018, 1.13], #Myo data
-    'inDV_lambda_anisotropic_coeffs' : [0.02343, -0.4289, 1.331], #WT data
-    'thickness_polynomial_obj' : None,
+    'lambda_isotropic_coeffs' : [-0.1682,1.38], #Myo data
+    #'lambda_isotropic_coeffs' : [-0.2792,1.432], #WT data
+    'lambda_anisotropic_coeffs' : [-0.005645, 0.08389, 0.9954], #Myo data
+    #'lambda_anisotropic_coeffs' : [-0.009308, 0.1376, 1.037], #WT data
+    'inDV_lambda_isotropic_coeffs' : [-0.01954,1.028], #Myo data
+    #'inDV_lambda_isotropic_coeffs' : [-0.06108,1.387], #WT data
+    'inDV_lambda_anisotropic_coeffs' : [0.0007879, -0.1018, 1.13], #Myo data
+    #'inDV_lambda_anisotropic_coeffs' : [0.02343, -0.4289, 1.331], #WT data
+    'lambda_height_coeffs' : [-0.4064, 0.7585, 0.8148], #Myo data
+    #'lambda_height_coeffs' : [0.1655, 0.2034, 0.7339], #WT data
+    'inDV_lambda_height_coeffs' : [0.02713, 0.7219], #Myo data
+    #'inDV_lambda_height_coeffs' : [0.01568, 0.5996], #WT data
+
 }
 
 
@@ -117,6 +121,8 @@ lambda_isotropic_obj = np.poly1d(lambda_isotropic_coeffs)
 lambda_anisotropic_obj = np.poly1d(lambda_anisotropic_coeffs)
 inDV_lambda_isotropic_obj = np.poly1d(inDV_lambda_isotropic_coeffs)
 inDV_lambda_anisotropic_obj = np.poly1d(inDV_lambda_anisotropic_coeffs)
+lambda_height_obj = np.poly1d(lambda_height_coeffs)
+inDV_lambda_height_obj = np.poly1d(inDV_lambda_height_coeffs)
 
 #changing natural lengths of springs
 for index, row in springs_df.iterrows():
@@ -129,6 +135,8 @@ for index, row in springs_df.iterrows():
                                           volume_conservation = volume_conservation, 
                                           lambda_anisotropic_obj = lambda_anisotropic_obj, lambda_isotropic_obj = lambda_isotropic_obj,
                                           inDV_lambda_anisotropic_obj = inDV_lambda_anisotropic_obj, inDV_lambda_isotropic_obj = inDV_lambda_isotropic_obj,
+                                          lambda_height_obj = lambda_height_obj,
+                                          inDV_lambda_height_obj = inDV_lambda_height_obj,
                                           )
         lambda_beta = get_fit_lambda([row['x2'], row['y2'], row['z2']],
                                           theta_max = theta_max,
@@ -136,6 +144,8 @@ for index, row in springs_df.iterrows():
                                           volume_conservation = volume_conservation, 
                                           lambda_anisotropic_obj = lambda_anisotropic_obj, lambda_isotropic_obj = lambda_isotropic_obj,
                                           inDV_lambda_anisotropic_obj = inDV_lambda_anisotropic_obj, inDV_lambda_isotropic_obj = inDV_lambda_isotropic_obj,
+                                          lambda_height_obj = lambda_height_obj,
+                                          inDV_lambda_height_obj = inDV_lambda_height_obj,
                                           )
 
     lambda_alpha_beta = 0.5*(lambda_alpha + lambda_beta)

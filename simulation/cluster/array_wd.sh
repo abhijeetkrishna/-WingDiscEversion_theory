@@ -3,7 +3,7 @@
 #SBATCH -J wd
 #SBATCH -o log_files/wd_out_%A_%a
 #SBATCH -e log_files/wd_err_%A_%a
-#SBATCH -t 15:00:00
+#SBATCH -t 3:00:00
 #SBATCH -a 0-7
 
 
