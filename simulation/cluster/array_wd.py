@@ -69,7 +69,8 @@ thick_mesh_file = 'gmsh_r_30_rotated_spherical_cap_theta_' + str(np.round(theta_
 mesh_file = "gmsh_sphere_lattice_r_30.pickle"
 
 #Uncomment the following two lines to get differential thickness
-thickness_polynomial_coeffs = np.array([-0.22, 1.22])*thickness
+#thickness_polynomial_coeffs = np.array([-0.22, 1.22])*thickness
+thickness_polynomial_coeffs = np.array([-0.1397, 0, 1.1397])*thickness
 thickness_polynomial_obj = np.poly1d(thickness_polynomial_coeffs)
 
 if not(os.path.isfile(thick_mesh_file + '.pickle')):

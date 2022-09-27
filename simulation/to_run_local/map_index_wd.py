@@ -10,7 +10,7 @@ import numpy as np
 def main():
     job_id=sys.argv[1]
     var_dict={
-    'thickness':[0.1,0.15,0.25],
+    'thickness':[0.1],#[0.1,0.15,0.25],
     #'lambda_anisotropic':[10**(-1), 10**(-0.5), 10**(-0.2), 10**(0), 10**(0.2), 10**(0.5), 10**(1)]
     #'lambda_anisotropic':[0.8, 0.85,0.9,0.95,1, 1.05, 1.1, 1.15, 1.2]
     #'lambda_anisotropic_inDV':[0.96, 0.98, 1, 1.01, 1.02, 1.03,1.04,1.05],
