@@ -411,7 +411,7 @@ int main(int argc, char * argv[])
         
     int ctr=1;
     //Writing first frame
-    particles.write_frame(dir + "Spring",ctr,CSV_WRITER);
+    //particles.write_frame(dir + "Spring",ctr,CSV_WRITER);
 
     double avg_movement = 99999; // to sum the displacement of each particle in order to check whether the simulation is moving
 

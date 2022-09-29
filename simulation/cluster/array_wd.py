@@ -10,7 +10,7 @@ task_id=int(sys.argv[2])
 #getting the dictionary of variables and their default values
 var_dict = {
 	'seed':0,
-	'nb_iterations':60,
+	'nb_iterations':20,
 	'thickness':0.1,
 	#'DV_growth':2,
     #'lambda_anisotropic':1,
@@ -28,18 +28,18 @@ var_dict = {
 	#'inDV_gradient':True,
 	#'inDV_isotropic':False,
 	'overwrite_old_simulation':True,
-    'lambda_isotropic_coeffs' : [-0.1682,1.38], #Myo data
-    #'lambda_isotropic_coeffs' : [-0.2792,1.432], #WT data
-    'lambda_anisotropic_coeffs' : [-0.005645, 0.08389, 0.9954], #Myo data
-    #'lambda_anisotropic_coeffs' : [-0.009308, 0.1376, 1.037], #WT data
-    'inDV_lambda_isotropic_coeffs' : [-0.01954,1.028], #Myo data
-    #'inDV_lambda_isotropic_coeffs' : [-0.06108,1.387], #WT data
-    'inDV_lambda_anisotropic_coeffs' : [0.0007879, -0.1018, 1.13], #Myo data
-    #'inDV_lambda_anisotropic_coeffs' : [0.02343, -0.4289, 1.331], #WT data
-    'lambda_height_coeffs' : [-0.4064, 0.7585, 0.8148], #Myo data
-    #'lambda_height_coeffs' : [0.1655, 0.2034, 0.7339], #WT data
-    'inDV_lambda_height_coeffs' : [0.02713, 0.7219], #Myo data
-    #'inDV_lambda_height_coeffs' : [0.01568, 0.5996], #WT data
+    #'lambda_isotropic_coeffs' : [-0.1682,1.38], #Myo data
+    'lambda_isotropic_coeffs' : [-0.2792,1.432], #WT data
+    #'lambda_anisotropic_coeffs' : [-0.005645, 0.08389, 0.9954], #Myo data
+    'lambda_anisotropic_coeffs' : [1,], #[-0.009308, 0.1376, 1.037], #WT data
+    #'inDV_lambda_isotropic_coeffs' : [-0.01954,1.028], #Myo data
+    'inDV_lambda_isotropic_coeffs' : [-0.06108,1.387], #WT data
+    #'inDV_lambda_anisotropic_coeffs' : [0.0007879, -0.1018, 1.13], #Myo data
+    'inDV_lambda_anisotropic_coeffs' : [1,], #[0.02343, -0.4289, 1.331], #WT data
+    #'lambda_height_coeffs' : [-0.4064, 0.7585, 0.8148], #Myo data
+    'lambda_height_coeffs' : [1,], #[0.1655, 0.2034, 0.7339], #WT data
+    #'inDV_lambda_height_coeffs' : [0.02713, 0.7219], #Myo data
+    'inDV_lambda_height_coeffs' : [1,], #[0.01568, 0.5996], #WT data
 
 }
 
@@ -73,13 +73,13 @@ mesh_file = "gmsh_sphere_lattice_r_30.pickle"
 thickness_polynomial_coeffs = np.array([-0.1397, 0, 1.1397])*thickness
 thickness_polynomial_obj = np.poly1d(thickness_polynomial_coeffs)
 
-if not(os.path.isfile(thick_mesh_file + '.pickle')):
-    print('generating mesh for thickness : ' + str(thickness))
-    #print('getting thick mesh out of thin mesh')
-    init_gmsh_spherical_cap_mesh(mesh_file = mesh_file,theta_max = theta_max,R = 1, nstack = 2,
-             thickness = thickness, thickness_polynomial_obj = thickness_polynomial_obj, 
-             output_pickle = thick_mesh_file+'.pickle', output_vtk = thick_mesh_file+'.vtk',
-             )
+#if not(os.path.isfile(thick_mesh_file + '.pickle')):
+print('generating mesh for thickness : ' + str(thickness))
+#print('getting thick mesh out of thin mesh')
+init_gmsh_spherical_cap_mesh(mesh_file = mesh_file,theta_max = theta_max,R = 1, nstack = 2,
+         thickness = thickness, thickness_polynomial_obj = thickness_polynomial_obj, 
+         output_pickle = thick_mesh_file+'.pickle', output_vtk = thick_mesh_file+'.vtk',
+         )
 
 print('thickness', thickness, 'theta_DV', theta_DV)
 
@@ -102,10 +102,10 @@ springs_df = update_springs(springs_df, balls_df[['x', 'y', 'z']])
 
 #Change the radius of the spherical cap
 
-balls_df.to_csv(dirname + 'sim_output/orig_sized_balls.csv', index = False)
-springs_df.to_csv(dirname + 'sim_output/orig_sized_springs.csv', index = False)
-print('resizing mesh')
-[balls_df, springs_df] = change_radius_of_cap_mesh(balls_df, springs_df, R_new = R_initial, thickness = thickness)
+#balls_df.to_csv(dirname + 'sim_output/orig_sized_balls.csv', index = False)
+#springs_df.to_csv(dirname + 'sim_output/orig_sized_springs.csv', index = False)
+#print('resizing mesh')
+#[balls_df, springs_df] = change_radius_of_cap_mesh(balls_df, springs_df, R_new = R_initial, thickness = thickness)
 
 
 if k_type == 'k_DV':
@@ -215,7 +215,7 @@ for i in range(nb_iterations):
         shutil.rmtree('files/')
 
     print('$$$$$$$ Running openfpm $$$$$$$')
-    os.system("cd " + dirname + " && source ~/openfpm_vars && make && grid") #if this does not work then put /home/krishna/openfpm_vars
+    os.system("cd " + dirname + " && source ~/openfpm_vars && make && grid")
     print('$$$$ Exit OpenFPM $$$$')
     
     #rename the folder
