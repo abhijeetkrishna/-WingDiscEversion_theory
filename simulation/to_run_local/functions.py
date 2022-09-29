@@ -1250,8 +1250,30 @@ def compute_forces(balls,springs,tol=1e-4,dt=0.01,nrow=3,ncol=3,k=1,print_=False
 
     return([balls,springs]) #returning a dictionary such that dictionary['balls']=balls and dictionary['springs']=springs 
 
-
-def dfToVtk(balls, springs, pattern='trianglemesh',nrow=3, ncol=3, filename='trianglemesh.vtk',lines=True,add_polygons=True,**kwargs):
+def dfToVtk(balls, springs, only_top_surface = False, only_bottom_surface = False,
+            filename='trianglemesh.vtk', pattern='trianglemesh',
+            lines=True,add_polygons=True, add_lines_properties = False, add_polygon_properties = False,
+            return_text = False, **kwargs):
+    
+    #if add_lines_properties and add_polygons both are true then Paraview does not show the properties
+    #we give preference to showing lines properties hence we put add_polygons False if add_lines_properties is True
+    if add_lines_properties:
+        add_polygons = False
+    if add_polygon_properties:
+        lines = False
+    
+    if only_top_surface:
+        #balls_orig = balls.copy(deep = True)
+        #springs_orig = springs.copy(deep = True)
+        springs = springs[(springs['ball1'] >= len(balls)/2) & (springs['ball2'] >= len(balls)/2)]
+        balls = balls[balls['ID'] >= len(balls)/2]
+        
+    if only_bottom_surface:
+        #balls_orig = balls.copy(deep = True)
+        #springs_orig = springs.copy(deep = True)
+        springs = springs[(springs['ball1'] < len(balls)/2) & (springs['ball2'] < len(balls)/2)]
+        balls = balls[balls['ID'] < len(balls)/2]
+        
     
     #Removing extra small values because they give errors
     balls.loc[abs(balls.x)<1e-10,'x']=0
@@ -1309,7 +1331,7 @@ def dfToVtk(balls, springs, pattern='trianglemesh',nrow=3, ncol=3, filename='tri
                     'Nbvertices':[3]*len(triad_cliques)
                     })
         else:
-            polygons=get_polygons(balls=balls[['ID','x','y','z']], springs=springs,pattern=pattern, nrow=nrow, ncol=ncol,compute_attributes = False)
+            polygons=get_polygons(balls=balls[['ID','x','y','z']], springs=springs,compute_attributes = False)
 
         text=text+'POLYGONS '+str(len(polygons))+' '+str(len(polygons)+polygons['Nbvertices'].sum())+'\n'
         for i in range(len(polygons)):
@@ -1330,9 +1352,52 @@ def dfToVtk(balls, springs, pattern='trianglemesh',nrow=3, ncol=3, filename='tri
             text=text+str(2)+' '+str(springs.loc[i,'ball1'])+' '+str(springs.loc[i,'ball2'])+'\n'
             #we can also get the lines from the edges column of the polygons
         text=text+'\n'
+        
+        
+    ####################
+    # lines properties #
+    ####################
+    
+    if add_lines_properties:
+    
+        first = True
+        data_length = len(springs)
+        col_names = springs.columns
+        props_to_avoid = ['ID', 'x1', 'y1', 'z1', 'x2', 'y2', 'z2', 'k','ball1', 'ball2', 'type', 'viscoelastic_coeff']
+
+        for col_name in col_names:
+
+            if col_name in props_to_avoid:
+                continue
+
+            #naming property
+            prop_name = col_name
+            #prop_name = prop_name.replace('l0', 'PreferredLength')
+            prop_name = prop_name.replace('l1', 'l')
+
+            #getting array of values
+            prop_data = springs[col_name].values
+
+            if first == True:
+                text=text+"\nCELL_DATA "+str(data_length)+'\n'
+                first = False
+
+            text=text+"SCALARS "+prop_name+" float 1\nLOOKUP_TABLE default\n"
+            text=text+'\n'.join([str(v) for v in prop_data])+'\n'
+    
+    ###############
+    # Saving file #
+    ###############
     
     with open(filename, "w") as file:
         file.write(text)
+        
+    ##########
+    # Return #
+    ##########
+
+    if return_text:
+        return(text)
 
 def polygons_square(balls, springs, nrow, ncol):
     
