@@ -294,7 +294,7 @@ def get_k_differences_per_roi_per_stagePair(k_N_alldiscs, devstages = ['upcrawli
 
     return([f_alpha_beta_df, stat_df])
 
-def get_k_differences(k_N_alldiscs, devstage_combinations = None, devstages = ['upcrawling','whitePupa','2hAPF','4hAPF'], rois = ['outDV', 'DV'], fit_param = 'k_beta', N_ref_pathlength_dict = None):
+def get_k_differences(k_N_alldiscs, devstage_combinations = None, devstages = ['upcrawling','whitePupa','2hAPF','4hAPF'], rois = ['outDV', 'DV'], fit_param = 'k_beta', N_ref_pathlength_dict = None, fit_deg = 1):
 
     if devstage_combinations is None:
         devstage_combinations = pd.DataFrame({'devstage_init':devstages[0:len(devstages)-1], 'devstage_final':devstages[1:]})
@@ -309,7 +309,7 @@ def get_k_differences(k_N_alldiscs, devstage_combinations = None, devstages = ['
 
         for roi in rois:
             
-            [k_diff_stage_roi, k_diff_stat_stage_roi] =  get_k_differences_per_roi_per_stagePair(k_N_alldiscs, devstages = [devstage_init, devstage_final], roi = roi, fit_param = fit_param, N_ref_pathlength_dict = N_ref_pathlength_dict)
+            [k_diff_stage_roi, k_diff_stat_stage_roi] =  get_k_differences_per_roi_per_stagePair(k_N_alldiscs, devstages = [devstage_init, devstage_final], roi = roi, fit_param = fit_param, N_ref_pathlength_dict = N_ref_pathlength_dict, fit_deg = fit_deg)
             k_diff = pd.concat([k_diff, k_diff_stage_roi]).reset_index(drop = True)
             k_diff_stat = pd.concat([k_diff_stat, k_diff_stat_stage_roi]).reset_index(drop = True)
             
@@ -546,7 +546,10 @@ def get_prop_differences_per_roi_per_stagePair(df, prop = 'area', operation = 's
 
     #######
     #get fit line
-    coeffs = np.polyfit(stat_df[fit_param], stat_df[prop + '_diff_mean'], w = 1/stat_df[prop + '_diff_std'], deg = fit_deg)
+    full_result = np.polyfit(stat_df[fit_param], stat_df[prop + '_diff_mean'], w = 1/stat_df[prop + '_diff_std'], deg = fit_deg, full = True)
+    coeffs = full_result[0]
+    residual = full_result[1][0]
+    print("residual " + str(residual))
     poly_obj = np.poly1d(coeffs)
     stat_df['fit_'+prop+'_diff'] = poly_obj(stat_df[fit_param])
     stat_df['fit_'+prop+'_coeffs'] = [coeffs]*len(stat_df)

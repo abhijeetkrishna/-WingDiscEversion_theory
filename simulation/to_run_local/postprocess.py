@@ -16,6 +16,7 @@ for i in range(len(input_var)):
         init_mesh_path = 'gmsh_r_30_rotated_spherical_cap_theta_23.08_thickness_' + str(thickness) + '.pickle'
     #var_dict[input_var[i]]=map_index.loc[task_id,str(input_var[i])]
 
+skipby = 2
 
 ############
 # Adding properties to edges
@@ -38,7 +39,11 @@ times = np.sort(times)
 
 
 for t in times:
-    
+
+    if not(t%skipby == 0):
+        if not(t == times[-1]):
+            continue
+
     print('timepoint : ' + str(t))
     
     df_timepoint = pd.read_csv(dirname + 'sim_output/growth_' + str(t) + '/final_0_0.csv') 
@@ -48,23 +53,29 @@ for t in times:
     #calculating some properties that are not there already
     springs_df['l0_target/l1'] = springs_df['l0_target']/springs_df['l1']
     springs_df['l1/l0_target'] = springs_df['l1']/springs_df['l0_target']
+    springs_df['l0_target_final/l1'] = springs_df['l0_target_final']/springs_df['l1']
+    springs_df['l1/l0_target_final'] = springs_df['l1']/springs_df['l0_target_final']
     springs_df['l0/l1_initial'] = springs_df['l0']/springs_df['l1_initial']
     springs_df['l1/l1_initial'] = springs_df['l1']/springs_df['l1_initial']
     springs_df['l0/l1'] = springs_df['l0']/springs_df['l1']
     springs_df['l1/l0'] = springs_df['l0']/springs_df['l1']
     
+    
+    dfToVtk(balls_df,springs_df,filename=dirname + 'sim_output/bulk_'+ str(t) + '.vtk',
+        add_polygons = True)
+
     #getting vtk with properties on thick mesh
     dfToVtk(balls_df, springs_df, add_lines_properties=True, return_text=False,
             filename = dirname + 'sim_output/thick_wireframe_'+ str(t) + '.vtk',
            )
     
     #getting vtk with properties on thick mesh
-    dfToVtk(balls_df, springs_df, only_top_surface=True, add_lines_properties=True, return_text=False,
-            filename = dirname + 'sim_output/top_wireframe_'+ str(t) + '.vtk',
-           )
-    dfToVtk(balls_df, springs_df, only_bottom_surface=True, add_lines_properties=True, return_text=False,
-            filename = dirname + 'sim_output/bottom_wireframe_'+ str(t) + '.vtk',
-           )
+    #dfToVtk(balls_df, springs_df, only_top_surface=True, add_lines_properties=True, return_text=False,
+    #        filename = dirname + 'sim_output/top_wireframe_'+ str(t) + '.vtk',
+    #       )
+    #dfToVtk(balls_df, springs_df, only_bottom_surface=True, add_lines_properties=True, return_text=False,
+    #        filename = dirname + 'sim_output/bottom_wireframe_'+ str(t) + '.vtk',
+    #       )
 
 
 
@@ -76,7 +87,7 @@ for t in times:
 #############
 
 #not every file needs to be computed because it takes long
-skipby = 5
+
 
 
 springs = pd.read_csv(dirname + 'sim_output/init_springs.csv')
@@ -127,19 +138,19 @@ triangles_top = get_oriented_triangles(balls_top, springs_top)
 #we need these vertices because the Gaussian curvature is not calculated on the boundary vertices
 nonboundary_id_top = balls_top.loc[balls_top['theta'] < 0.9*max(balls_top['theta']),'ID']
 
-print('getting bottom surface')
+#print('getting bottom surface')
 #get bottom surface
-springs_bottom = springs[(springs['ball1'] < len(balls)/2) & (springs['ball2'] < len(balls)/2)]
-balls_bottom = balls[balls['ID'] < len(balls)/2]
-bottom_id_array = balls_bottom['ID'].values
+#springs_bottom = springs[(springs['ball1'] < len(balls)/2) & (springs['ball2'] < len(balls)/2)]
+#balls_bottom = balls[balls['ID'] < len(balls)/2]
+#bottom_id_array = balls_bottom['ID'].values
 #reindex
-[balls_bottom, springs_bottom] = reindex_balls_springs(balls_bottom, springs_bottom)
+#[balls_bottom, springs_bottom] = reindex_balls_springs(balls_bottom, springs_bottom)
 #get triangles
-print('getting triangles')
-triangles_bottom = get_oriented_triangles(balls_bottom, springs_bottom)
+#print('getting triangles')
+#triangles_bottom = get_oriented_triangles(balls_bottom, springs_bottom)
 #get indices of vertices that are not on the boundary
 #we need these vertices because the Gaussian curvature is not calculated on the boundary vertices
-nonboundary_id_bottom = balls_bottom.loc[balls_bottom['theta'] < 0.9*max(balls_bottom['theta']),'ID']
+#nonboundary_id_bottom = balls_bottom.loc[balls_bottom['theta'] < 0.9*max(balls_bottom['theta']),'ID']
 
 print('measuring curvature')
 
@@ -156,16 +167,16 @@ for t in times:
     springs = update_springs(springs, balls[['x', 'y', 'z']])
     
     
-    balls_bottom[['x','y','z']] = balls.loc[bottom_id_array, ['x','y','z']].values
+    #balls_bottom[['x','y','z']] = balls.loc[bottom_id_array, ['x','y','z']].values
     balls_top[['x','y','z']] = balls.loc[top_id_array, ['x','y','z']].values
 
     #measure curvature
     #if not(os.path.exists(dirname + 'sim_output/bottom_surface_'+ str(t) + '.vtk')):
-    [gc_bottom, mc_bottom, triangles_db_bottom, vertices_db_bottom] = measure_integrated_curvature(balls_bottom, springs_bottom, triangles = triangles_bottom,
-                                                                                                   filename = dirname + 'sim_output/bottom_surface_'+ str(t) + '.vtk',
-                                                                                                   nonboundary_indices = nonboundary_id_bottom, write_vtk=True,
-                                                                                                   z_offset = -0.0001
-                                                                                                  )
+    #[gc_bottom, mc_bottom, triangles_db_bottom, vertices_db_bottom] = measure_integrated_curvature(balls_bottom, springs_bottom, triangles = triangles_bottom,
+    #                                                                                               filename = dirname + 'sim_output/bottom_surface_'+ str(t) + '.vtk',
+    #                                                                                               nonboundary_indices = nonboundary_id_bottom, write_vtk=True,
+    #                                                                                               z_offset = -0.0001
+    #                                                                                              )
     #if not(os.path.exists(dirname + 'sim_output/top_surface_'+ str(t) + '.vtk')):
     [gc_top, mc_top, triangles_db_top, vertices_db_top] = measure_integrated_curvature(balls_top, springs_top, triangles = triangles_top,
                                                                                        filename = dirname + 'sim_output/top_surface_'+ str(t) + '.vtk',
