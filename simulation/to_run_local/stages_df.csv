@@ -1,31 +1,41 @@
-,stage,stage_name,prop,value
-0,0,wL3 to 0hAPF,lambda_isotropic_coeffs,[-0.12536333  1.19815406]
-1,1,wL3 to 2hAPF,lambda_isotropic_coeffs,[-0.29702119  1.41002289]
-2,2,wL3 to 4hAPF,lambda_isotropic_coeffs,[-0.27918239  1.43242885]
-3,0,wL3 to 0hAPF,inDV_lambda_isotropic_coeffs,[-0.11088804  1.18302581]
-4,1,wL3 to 2hAPF,inDV_lambda_isotropic_coeffs,[-0.10943282  1.15575677]
-5,2,wL3 to 4hAPF,inDV_lambda_isotropic_coeffs,[-0.06107883  1.38717955]
-6,0,wL3 to 0hAPF,lambda_Q_coeffs,[-0.07661543  1.00033837]
-7,1,wL3 to 2hAPF,lambda_Q_coeffs,[-0.03758283  0.95543081]
-8,2,wL3 to 4hAPF,lambda_Q_coeffs,[-0.0485437   0.98414338]
-9,0,wL3 to 0hAPF,inDV_lambda_Q_coeffs,[-0.04618968  1.07040239]
-10,1,wL3 to 2hAPF,inDV_lambda_Q_coeffs,[-0.07077685  1.10230737]
-11,2,wL3 to 4hAPF,inDV_lambda_Q_coeffs,[-0.06931     0.99459924]
-12,0,wL3 to 0hAPF,lambda_rearrangement_coeffs,[0.0578045  1.03799039]
-13,1,wL3 to 2hAPF,lambda_rearrangement_coeffs,[0.17140183 1.02207739]
-14,2,wL3 to 4hAPF,lambda_rearrangement_coeffs,[0.19174773 1.05368613]
-15,0,wL3 to 0hAPF,inDV_lambda_rearrangement_coeffs,[-0.16358571  1.11379917]
-16,1,wL3 to 2hAPF,inDV_lambda_rearrangement_coeffs,[-0.17084077  1.26588258]
-17,2,wL3 to 4hAPF,inDV_lambda_rearrangement_coeffs,[-0.33801003  1.33804963]
-18,0,wL3 to 0hAPF,lambda_anisotropic_coeffs,[-0.00442872 -0.02170203  1.03834162]
-19,1,wL3 to 2hAPF,lambda_anisotropic_coeffs,[-0.00644177  0.12535003  0.97652423]
-20,2,wL3 to 4hAPF,lambda_anisotropic_coeffs,[-0.00930815  0.13755743  1.03697823]
-21,0,wL3 to 0hAPF,inDV_lambda_anisotropic_coeffs,[ 0.00755597 -0.22654857  1.19221329]
-22,1,wL3 to 2hAPF,inDV_lambda_anisotropic_coeffs,[ 0.01209157 -0.27791423  1.39539169]
-23,2,wL3 to 4hAPF,inDV_lambda_anisotropic_coeffs,[ 0.02342747 -0.42892474  1.33082315]
-24,0,wL3 to 0hAPF,lambda_height_coeffs,[0.19483583 0.93507561]
-25,1,wL3 to 2hAPF,lambda_height_coeffs,[0.32800156 0.77609786]
-26,2,wL3 to 4hAPF,lambda_height_coeffs,[0.36552607 0.70714808]
-27,0,wL3 to 0hAPF,inDV_lambda_height_coeffs,[0.11723595 0.83287207]
-28,1,wL3 to 2hAPF,inDV_lambda_height_coeffs,[0.10641486 0.67977639]
-29,2,wL3 to 4hAPF,inDV_lambda_height_coeffs,[0.01568163 0.59956356]
+,stage,stage_name,prop,value,stage_init,stage_final
+0,0,wL3 to 0hAPF,lambda_isotropic_coeffs,[-0.12536333  1.19815406],wL3,0hAPF
+1,1,wL3 to 2hAPF,lambda_isotropic_coeffs,[-0.29702119  1.41002289],wL3,2hAPF
+2,2,wL3 to 4hAPF,lambda_isotropic_coeffs,[-0.27918239  1.43242885],wL3,4hAPF
+3,3,wL3 to 6hAPF,lambda_isotropic_coeffs,[-0.29226315  1.838463  ],wL3,6hAPF
+4,0,wL3 to 0hAPF,inDV_lambda_isotropic_coeffs,[-0.11088804  1.18302581],wL3,0hAPF
+5,1,wL3 to 2hAPF,inDV_lambda_isotropic_coeffs,[-0.10943282  1.15575677],wL3,2hAPF
+6,2,wL3 to 4hAPF,inDV_lambda_isotropic_coeffs,[-0.06107883  1.38717955],wL3,4hAPF
+7,3,wL3 to 6hAPF,inDV_lambda_isotropic_coeffs,[-0.23010645  1.96739859],wL3,6hAPF
+8,0,wL3 to 0hAPF,lambda_Q_coeffs,[-0.07661543  1.00033837],wL3,0hAPF
+9,1,wL3 to 2hAPF,lambda_Q_coeffs,[-0.03758283  0.95543081],wL3,2hAPF
+10,2,wL3 to 4hAPF,lambda_Q_coeffs,[-0.0485437   0.98414338],wL3,4hAPF
+11,3,wL3 to 6hAPF,lambda_Q_coeffs,[0.0110676  0.98661687],wL3,6hAPF
+12,0,wL3 to 0hAPF,inDV_lambda_Q_coeffs,[-0.04618968  1.07040239],wL3,0hAPF
+13,1,wL3 to 2hAPF,inDV_lambda_Q_coeffs,[-0.07077685  1.10230737],wL3,2hAPF
+14,2,wL3 to 4hAPF,inDV_lambda_Q_coeffs,[-0.06931     0.99459924],wL3,4hAPF
+15,3,wL3 to 6hAPF,inDV_lambda_Q_coeffs,[-0.12523359  1.05347739],wL3,6hAPF
+16,0,wL3 to 0hAPF,lambda_rearrangement_coeffs,[0.0578045  1.03799039],wL3,0hAPF
+17,1,wL3 to 2hAPF,lambda_rearrangement_coeffs,[0.17140183 1.02207739],wL3,2hAPF
+18,2,wL3 to 4hAPF,lambda_rearrangement_coeffs,[0.19174773 1.05368613],wL3,4hAPF
+19,3,wL3 to 6hAPF,lambda_rearrangement_coeffs,[0.23998774 1.04875695],wL3,6hAPF
+20,0,wL3 to 0hAPF,inDV_lambda_rearrangement_coeffs,[-0.16358571  1.11379917],wL3,0hAPF
+21,1,wL3 to 2hAPF,inDV_lambda_rearrangement_coeffs,[-0.17084077  1.26588258],wL3,2hAPF
+22,2,wL3 to 4hAPF,inDV_lambda_rearrangement_coeffs,[-0.33801003  1.33804963],wL3,4hAPF
+23,3,wL3 to 6hAPF,inDV_lambda_rearrangement_coeffs,[-0.33799543  1.80441874],wL3,6hAPF
+24,0,wL3 to 0hAPF,lambda_anisotropic_coeffs,[-0.00442872 -0.02170203  1.03834162],wL3,0hAPF
+25,1,wL3 to 2hAPF,lambda_anisotropic_coeffs,[-0.00644177  0.12535003  0.97652423],wL3,2hAPF
+26,2,wL3 to 4hAPF,lambda_anisotropic_coeffs,[-0.00930815  0.13755743  1.03697823],wL3,4hAPF
+27,3,wL3 to 6hAPF,lambda_anisotropic_coeffs,[0.00265609 0.24838318 1.0347213 ],wL3,6hAPF
+28,0,wL3 to 0hAPF,inDV_lambda_anisotropic_coeffs,[ 0.00755597 -0.22654857  1.19221329],wL3,0hAPF
+29,1,wL3 to 2hAPF,inDV_lambda_anisotropic_coeffs,[ 0.01209157 -0.27791423  1.39539169],wL3,2hAPF
+30,2,wL3 to 4hAPF,inDV_lambda_anisotropic_coeffs,[ 0.02342747 -0.42892474  1.33082315],wL3,4hAPF
+31,3,wL3 to 6hAPF,inDV_lambda_anisotropic_coeffs,[ 0.04232838 -0.58204438  1.90091435],wL3,6hAPF
+32,0,wL3 to 0hAPF,lambda_height_coeffs,[0.19483583 0.93507561],wL3,0hAPF
+33,1,wL3 to 2hAPF,lambda_height_coeffs,[0.32800156 0.77609786],wL3,2hAPF
+34,2,wL3 to 4hAPF,lambda_height_coeffs,[0.36552607 0.70714808],wL3,4hAPF
+35,3,wL3 to 6hAPF,lambda_height_coeffs,[0.12498559 0.38642763],wL3,6hAPF
+36,0,wL3 to 0hAPF,inDV_lambda_height_coeffs,[0.11723595 0.83287207],wL3,0hAPF
+37,1,wL3 to 2hAPF,inDV_lambda_height_coeffs,[0.10641486 0.67977639],wL3,2hAPF
+38,2,wL3 to 4hAPF,inDV_lambda_height_coeffs,[0.01568163 0.59956356],wL3,4hAPF
+39,3,wL3 to 6hAPF,inDV_lambda_height_coeffs,[-0.01140586  0.35244879],wL3,6hAPF
