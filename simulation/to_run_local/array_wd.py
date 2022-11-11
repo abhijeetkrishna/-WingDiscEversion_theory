@@ -31,15 +31,15 @@ var_dict = {
     #'lambda_isotropic_coeffs' : [-0.1682,1.38], #Myo data
     'lambda_isotropic_coeffs' : [-0.2792,1.432], #WT data
     #'lambda_anisotropic_coeffs' : [-0.005645, 0.08389, 0.9954], #Myo data
-    'lambda_anisotropic_coeffs' : [1,], #[-0.009308, 0.1376, 1.037], #WT data
+    'lambda_anisotropic_coeffs' : [-0.009308, 0.1376, 1.037], #WT data
     #'inDV_lambda_isotropic_coeffs' : [-0.01954,1.028], #Myo data
     'inDV_lambda_isotropic_coeffs' : [-0.06108,1.387], #WT data
     #'inDV_lambda_anisotropic_coeffs' : [0.0007879, -0.1018, 1.13], #Myo data
-    'inDV_lambda_anisotropic_coeffs' : [1,], #[0.02343, -0.4289, 1.331], #WT data
+    'inDV_lambda_anisotropic_coeffs' : [0.02343, -0.4289, 1.331], #WT data
     #'lambda_height_coeffs' : [-0.4064, 0.7585, 0.8148], #Myo data
-    'lambda_height_coeffs' : [1,], #[0.1655, 0.2034, 0.7339], #WT data
+    'lambda_height_coeffs' : [0.1655, 0.2034, 0.7339], #WT data
     #'inDV_lambda_height_coeffs' : [0.02713, 0.7219], #Myo data
-    'inDV_lambda_height_coeffs' : [1,], #[0.01568, 0.5996], #WT data
+    'inDV_lambda_height_coeffs' : [0.01568, 0.5996], #WT data
 
 }
 

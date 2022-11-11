@@ -78,8 +78,6 @@ def save_files_for_cpp(balls_df, springs_df, path, spring_columns, part_columns)
     #the indication whether the particle is active or not
     balls=balls_df[['ID','x','y','z', 'n_neigh']+part_columns].values
     np.savetxt(path + "balls.csv", balls, delimiter=" ")
-    
-    
 
 def poisson_disc_sampling(r, dim): 
     """code from: https://github.com/scipython/scipython-maths/tree/master/poisson_disc_sampled_noise"""

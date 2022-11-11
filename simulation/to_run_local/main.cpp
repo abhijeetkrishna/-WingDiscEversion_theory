@@ -29,6 +29,10 @@ constexpr int active       =    10;
 constexpr int spring_active    =   11;
 constexpr int n_nbs     =   12;
 constexpr int ext_force = 13;
+constexpr int n_tri = 14;
+constexpr int tri_V1 = 15;
+constexpr int tri_V2 = 16;
+
 
 
 constexpr int nbs_max  =       22;
@@ -218,12 +222,12 @@ int main(int argc, char * argv[])
     grid_sm<3,void> g_cell(cell_sz);
     
     openfpm_init(&argc,&argv);
-    //                                 mass   velocity
-    vector_dist<3, double, aggregate<double,double[3],double[3],int,int[nbs_max],int[nbs_max],double[nbs_max],double[nbs_max],double[nbs_max],double[nbs_max],int,int[nbs_max],int, double[3]>> particles(0, box, bc, ghost,g_cell);
+    //                                 mass   velocity force    pid    nbs         onbs          length          n_length        k_s             n_s          active  spr_act n_nbs  ext_frc  n_tri    tri_V1       tri_V2     
+    vector_dist<3, double, aggregate<double,double[3],double[3],int,int[nbs_max],int[nbs_max],double[nbs_max],double[nbs_max],double[nbs_max],double[nbs_max],int,int[nbs_max],int, double[3], int, int[nbs_max], int[nbs_max]>> particles(0, box, bc, ghost,g_cell);
 
     
     auto & v_cl = create_vcluster<>();
-    particles.setPropNames({"mass","velocity","force","pid","nbs","onbs","length","n_length","k_s","n_s","active","spring_active","n_nbs", "ext_force"});
+    particles.setPropNames({"mass","velocity","force","pid","nbs","onbs","length","n_length","k_s","n_s","active","spring_active","n_nbs", "ext_force", "n_tri", "tri_V1", "tri_V2" });
     
     if (v_cl.rank() == 0)
     {
@@ -233,12 +237,17 @@ int main(int argc, char * argv[])
         std::ifstream l0_file("runfiles/neigh_l0.csv");
         std::ifstream k_file("runfiles/neigh_k.csv");
         std::ifstream ns_file("runfiles/neigh_viscoelastic_coeff.csv");
+        std::ifstream triV_file("runfiles/triangles_Vertex1.csv");
+        std::ifstream triV2_file("runfiles/triangles_Vertex2.csv");
+
 
         std::string line;
         std::string line_neigh;
         std::string line_l0;
         std::string line_k;
         std::string line_ns;
+        std::string line_triV;
+        //std::string line_triV2;
         
 
 
@@ -248,12 +257,16 @@ int main(int argc, char * argv[])
             std::getline(l0_file, line_l0);
             std::getline(k_file, line_k);
             std::getline(ns_file, line_ns);
+            std::getline(triV1_file, line_triV1);
+            std::getline(triV2_file, line_triV2);
 
             std::stringstream ss(line);
             std::stringstream ss_neigh(line_neigh);
             std::stringstream ss_l0(line_l0);
             std::stringstream ss_k(line_k);
             std::stringstream ss_ns(line_ns);
+            std::stringstream ss_triV1(line_triV1);
+            std::stringstream ss_triV2(line_triV2);
 
             particles.add();
 
@@ -289,6 +302,10 @@ int main(int argc, char * argv[])
                 particles.getLastProp<ext_force>()[i] = ext_force_input;
             }
 
+            double n_triangles; //number of triangles
+            ss >> n_triangles;
+            particles.getLastProp<n_tri>() = n_triangles;
+
             
             //std::cout << particles.template getLastProp<pid>() << " " << act << " "  << particles.getLastProp<active>() << "\n";
             
@@ -309,6 +326,16 @@ int main(int argc, char * argv[])
                 particles.getLastProp<n_length>()[i] = l0;
                 particles.getLastProp<k_s>()[i] = k;
                 particles.getLastProp<n_s>()[i] = ns;
+
+            }
+
+            for(int i = 0; i < n_triangles; i++){
+
+                int triangle_Vertex1, triangle_Vertex2;
+                ss_triV1 >> triangle_Vertex1;
+                ss_triV2 >> triangle_Vertex2;
+                particles.getLastProp<tri_V1>()[i] = triangle_Vertex1;
+                particles.getLastProp<tri_V2>()[i] = triangle_Vertex2;
 
             }
 
@@ -459,9 +486,10 @@ int main(int argc, char * argv[])
             double dy = dt*particles.template getProp<force>(p)[y];
             double dz = dt*particles.template getProp<force>(p)[z];
 
-            particles.getPos(p)[x]=particles.getPos(p)[x]+dx;
-            particles.getPos(p)[y]=particles.getPos(p)[y]+dy;
-            particles.getPos(p)[z]=particles.getPos(p)[z]+dz;
+
+            particles.getPos(p)[x] = particles.getPos(p)[x]+dx;
+            particles.getPos(p)[y] = particles.getPos(p)[y]+dy;
+            particles.getPos(p)[z] = particles.getPos(p)[z]+dz;
 
             avg_movement += sqrt(dx*dx + dy*dy + dz*dz);
             
@@ -552,6 +580,120 @@ int main(int argc, char * argv[])
                     //fz=fz+particles.template getProp<n_s>(p)[j]*(particles.template getProp<velocity>(nnp)[z]-particles.template getProp<velocity>(p)[z])* z1/xm;
                 }
             }
+
+            //Now we check if moving this particle will lead to some mesh inconsistency
+            //To check that we will go through each pair of triangles on the surface connected to particle p
+            //If the dot product of their normals is <0, then we will say fx,fy,fz = 0
+
+            int flag = 1;
+            for (int a = 0 ; a < (particles.getProp<n_tri>(p)-1) ; a++){
+                //get the first vertex
+                triangle_Vertex1 = particles.getProp<tri_V1>(p)[a];
+                //get the second vertex
+                triangle_Vertex2 = particles.getProp<tri_V2>(p)[a];
+                //loop through neighbours to get the object of the first and second vertex
+                int found_V1_flag = 0;
+                int found_V2_flag = 0;
+                for (int i = 0; i < particles.getProp<n_nbs>(p) ; i++){
+                    if ((found_V1_flag == 0) && (particles.getProp<nbs>(p)[i] == triangle_Vertex1)){
+                        found_V1_flag = 1;
+                        auto oV1 = particles.getProp<onbs>(p)[i];
+                        Point<3, double> xV1 = particles.getPos(oV1);
+                    }
+                    if ((found_V2_flag == 0) && (particles.getProp<nbs>(p)[i] == triangle_Vertex2)){
+                        found_V2_flag = 1;
+                        auto oV2 = particles.getProp<onbs>(p)[i];
+                        Point<3, double> xV2 = particles.getPos(oV2);
+                    }
+                    if (found_V1_flag*found_V2_flag == 1){
+                        //found the ID of both the vertices
+                        break;
+                    }
+                }
+                //get the vectors of the two sides
+                double x01, y01, z01, x02, y02, z02, xNa, yNa, zNa, mNa;
+                x01=xV1[x]-xp[x];
+                y01=xV1[y]-xp[y];
+                z01=xV1[z]-xp[z];
+                x02=xV2[x]-xp[x];
+                y02=xV2[y]-xp[y];
+                z02=xV2[z]-xp[z];
+                //get the unit normal vector
+                xNa = y01*z02 - y02*z01;
+                yNa = -x01*z02 + x02*z01;
+                zNa = x01*y02 - x02*y01;
+                mNa = sqrt(xNa*xNa+yNa*yNa+zNa*zNa);
+                if (mNa == 0){
+                    continue;
+                }
+                xNa = xNa/mNa;
+                yNa = yNa/mNa;
+                zNa = zNa/mNa;
+
+                for (int b = a+1; b < particles.getProp<n_tri>(p) ; b++){
+                    //get the normal of the b-th triangle
+                    //get the first vertex
+                    triangle_Vertex1 = particles.getProp<tri_V1>(p)[b];
+                    //get the second vertex
+                    triangle_Vertex2 = particles.getProp<tri_V2>(p)[b];
+                    //loop through neighbours to get the object of the first and second vertex
+                    int found_V1_flag = 0;
+                    int found_V2_flag = 0;
+                    for (int i = 0; i < particles.getProp<n_nbs>(p) ; i++){
+                        if ((found_V1_flag == 0) && (particles.getProp<nbs>(p)[i] == triangle_Vertex1)){
+                            found_V1_flag = 1;
+                            auto oV1 = particles.getProp<onbs>(p)[i];
+                            Point<3, double> xV1 = particles.getPos(oV1);
+                        }
+                        if ((found_V2_flag == 0) && (particles.getProp<nbs>(p)[i] == triangle_Vertex2)){
+                            found_V2_flag = 1;
+                            auto oV2 = particles.getProp<onbs>(p)[i];
+                            Point<3, double> xV2 = particles.getPos(oV2);
+                        }
+                        if (found_V1_flag*found_V2_flag == 1){
+                            //found the ID of both the vertices
+                            break;
+                        }
+                    }
+                    //get the vectors of the two sides
+                    double x01, y01, z01, x02, y02, z02, xNb, yNb, zNb, mNb;
+                    x01=xV1[x]-xp[x];
+                    y01=xV1[y]-xp[y];
+                    z01=xV1[z]-xp[z];
+                    x02=xV2[x]-xp[x];
+                    y02=xV2[y]-xp[y];
+                    z02=xV2[z]-xp[z];
+                    //get the unit normal vector
+                    xNb = y01*z02 - y02*z01;
+                    yNb = -x01*z02 + x02*z01;
+                    zNb = x01*y02 - x02*y01;
+                    mNb = sqrt(xNb*xNb+yNb*yNb+zNb*zNb);
+                    if (mNb == 0){
+                        continue;
+                    }
+                    xNb = xNb/mNb;
+                    yNb = yNb/mNb;
+                    zNb = zNb/mNb;
+
+                    //compute dot product of the two normal vectors
+                    double dot_NaNb;
+                    dot_NaNb = xNa*xNb + yNa*yNb + zNa*zNb;
+                    //check if the dot product of the two normals < 0
+                    //if yes, flag = 0 and break;
+                    if (dot_NaNb < 0){
+                        flag = 0;
+                    }
+                }
+
+                //if flag = 0, break
+                if (flag == 0){
+                    fx = 0;
+                    fy = 0;
+                    fz = 0;
+                    break;
+                }
+            }
+
             //are we not updating the force on the particles?
             particles.template getProp<force>(p)[x]=fx;
             particles.template getProp<force>(p)[y]=fy;

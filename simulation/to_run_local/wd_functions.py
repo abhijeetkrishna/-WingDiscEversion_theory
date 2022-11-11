@@ -591,6 +591,50 @@ def implement_growth_with_DV(balls_df, springs_df, growth_DV = 1, width = 0.25, 
 
     return(springs_df)
 
+def cyclicRotate_ar(ar = , first_value = 10):
+
+
+def vertexList_for_surfaceTri(row, triangles):
+
+    #for the given ball 
+    #get all triangles it is part of
+    #reorder vertices so that that particle is first in order while mainting the orientation of the triangle
+    #get all vertex1
+    #get all vertex2
+    #get length of vertex1 list
+
+    ID = row["ID"]
+
+    tri_subset = triangles[triangles.apply(lambda row: ID in row["vertices"], axis = 1)]
+    tri_subset["vertices"] = tri_subset.apply(lambda row: np.array(row["vertices"]), axis = 1)
+    tri_subset["rotated_vertices"] = tri_subset.apply(lambda row: np.roll(row["vertices"], -np.where(row["vertices"] == ID)[0][0]),axis = 1)
+    tri_subset["vertex1"] = tri_subset.apply(lambda row: row["vertices"][1],axis = 1)
+    tri_subset["vertex2"] = tri_subset.apply(lambda row: row["vertices"][2],axis = 1)
+
+    row["n_triangles_on_surface"] = len(tri_subset)
+    row["V1_list"] = tri_subset["vertex1"].values
+    row["V2_list"] = tri_subset["vertex2"].values
+
+    return(row)
+
+def get_surface_triangles(balls, springs):
+
+    #get top surface
+    springs_top = springs[(springs['ball1'] >= len(balls)/2) & (springs['ball2'] >= len(balls)/2)]
+    balls_top = balls[balls['ID'] >= len(balls)/2]
+    #get triangles
+    triangles_top = get_oriented_triangles(balls_top, springs_top)
+
+    #get bottom surface
+    springs_bottom = springs[(springs['ball1'] < len(balls)/2) & (springs['ball2'] < len(balls)/2)]
+    balls_bottom = balls[balls['ID'] < len(balls)/2]
+    #get triangles
+    triangles_bottom = get_oriented_triangles(balls_bottom, springs_bottom)
+    #combine triangles
+    surface_triangles = pd.concat([triangles_top, triangles_bottom]).reset_index(drop = True)
+
+    return (surface_triangles)
+
 
 def initialize_cpp_simulation(balls_df, springs_df, dt = 0.1,  csv_t_save = 1,
                               tol = 1e-5, path = '/'):
@@ -609,7 +653,22 @@ def initialize_cpp_simulation(balls_df, springs_df, dt = 0.1,  csv_t_save = 1,
     balls_df['ext_fy'] = 0
     balls_df['ext_fz'] = 0
 
-    save_files_for_cpp(balls_df, springs_df, path + 'runfiles/' , spring_columns = ['l0', 'k', 'viscoelastic_coeff'], part_columns = ['active', 'ext_fx', 'ext_fy', 'ext_fz'])
+    #add triangles information to  balls_df
+    surface_triangles = get_surface_triangles(balls_df)
+    balls_df = balls_df.apply(vertexList_for_surfaceTri, triangles = surface_triangles, axis = 1)
+
+    save_files_for_cpp(balls_df, springs_df, path + 'runfiles/' , spring_columns = ['l0', 'k', 'viscoelastic_coeff'], part_columns = ['active', 'ext_fx', 'ext_fy', 'ext_fz', 'n_triangles_on_surface'])
+    #save triangles file
+    #save vertices1
+    vert_list = balls_df["V1_list"].values.tolist()
+    with open("runfiles/triangles_Vertex1.csv", "w", newline="") as f:
+        writer = csv.writer(f, delimiter=' ')
+        writer.writerows(vert_list)
+
+    vert_list = balls_df["V2_list"].values.tolist()
+    with open("runfiles/triangles_Vertex2.csv", "w", newline="") as f:
+        writer = csv.writer(f, delimiter=' ')
+        writer.writerows(vert_list)
 
     dim_max = np.max(balls_df[['x', 'y', 'z']].values.flatten()) + 3 # I don't understand this right now : why +3?
 
