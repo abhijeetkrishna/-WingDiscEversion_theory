@@ -1,0 +1,15 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Wing Disc Eversion - Theory and Analysis
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Abhijeet
+    family-names: Krishna
+    email: krishna@mpi-cbg.de
+    orcid: 'https://orcid.org/0000-0002-9291-500X'
+    affiliation: 'MPI-CBG, Dresden'
