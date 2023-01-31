@@ -27,6 +27,7 @@ import os
 import warnings
 import pandas as pd
 import numpy as np
+import pickle
 import matplotlib.pyplot as plt
 #pd.set_option('display.max_rows', None)
 from scipy.interpolate import CubicSpline
@@ -133,7 +134,7 @@ def plot_montage(allcurves, genotypes = None, devstages = None, filename = None,
             plt.savefig(filename, bbox_inches = 'tight')
 
 
-def import_raw_crosssection_points(files = [],plot = False, crosssection = None):
+def import_raw_crosssection_points(files = [],plot = False, crosssection = None, scale_file = "Pixelscales.pkl"):
 
     #this function imports the data from a pickle file 
     #checks the orientation of the curves
@@ -161,6 +162,16 @@ def import_raw_crosssection_points(files = [],plot = False, crosssection = None)
             df_all = pd.read_csv(file)
         else:
             df_all = pd.read_pickle(file)
+        newnames = [i.replace('nubG4myoVI','ecadGFPnbG4myoVI') for i in df_all['disc']]
+        df_all['disc'] = newnames
+
+        with open(scale_file, "rb") as f:
+            scalesDF = pickle.load(f)
+        df_all = pd.merge(df_all, scalesDF)
+        df_all['pixel to micron'] = [np.float(i) for i in df_all['pixel to micron']]
+
+        df_all['x'] = df_all['x']*df_all['pixel to micron']
+        df_all['y'] = df_all['y']*df_all['pixel to micron']
 
         #df_all = df_all.drop_duplicates()
         disc_names = np.unique(df_all['disc'])
@@ -441,7 +452,9 @@ def interpolate_average_curves(allcurves,
         devstages = np.unique(allcurves['devstage'])
 
     df_all = pd.DataFrame()
-    columns = ['genotype', 'devstage', 'arclength','x','y','x_sd','y_sd','curvature','curvature_sd']
+    #columns = ['genotype', 'devstage', 'arclength','x','y','x_sd','y_sd','curvature','curvature_sd']
+    #Modified by Jana
+    columns = ['genotype', 'devstage', 'arclength','x','y','x_sd','y_sd','x_sem','y_sem','curvature','curvature_sd','curvature_sem']
     df_mean = pd.DataFrame(columns = columns)
 
 
@@ -471,7 +484,12 @@ def interpolate_average_curves(allcurves,
 
             #points on which we will find the coordinates of interpolated curve
             #we will make a mean curve out of the curve positions on these arclength locations
-            arclengths = np.linspace(max_negative_s, min_positive_s, 100)
+            #arclengths = np.linspace(max_negative_s, min_positive_s, 100)
+
+            ## intoducing a stepsize makes sure that spaing is the same in differnet length curves
+            #Added by Jana
+            step_size_in_microns = 5
+            arclengths = np.linspace(max_negative_s, min_positive_s, int(np.abs((min_positive_s - max_negative_s)/ step_size_in_microns)))
 
             #get interpolated curves with curvature as discrete points on 'arclengths' positions
             for disc_name in disc_names:
@@ -487,7 +505,9 @@ def interpolate_average_curves(allcurves,
             for arclength in arclengths:
                 df_arclength = df_all[df_all['arclength'] == arclength]
                 #columns = ['genotype', 'devstage', 'arclength','x','y','x_sd','y_sd','curvature','curvature_sd']
-                row = pd.DataFrame([[genotype, devstage,arclength,np.mean(df_arclength['x']), np.mean(df_arclength['y']), np.std(df_arclength['x']), np.std(df_arclength['y']), np.mean(df_arclength['curvature']), np.std(df_arclength['curvature'])]], columns=columns)
+                #row = pd.DataFrame([[genotype, devstage,arclength,np.mean(df_arclength['x']), np.mean(df_arclength['y']), np.std(df_arclength['x']), np.std(df_arclength['y']), np.mean(df_arclength['curvature']), np.std(df_arclength['curvature'])]], columns=columns)
+                #Modified by Jana
+                row = pd.DataFrame([[genotype, devstage,arclength,np.mean(df_arclength['x']), np.mean(df_arclength['y']), np.std(df_arclength['x']), np.std(df_arclength['y']), np.std(df_arclength['x'])/ np.sqrt(len(df_arclength)), np.std(df_arclength['y'])/ np.sqrt(len(df_arclength)), np.mean(df_arclength['curvature']), np.std(df_arclength['curvature']), np.std(df_arclength['curvature']) / np.sqrt(len(df_arclength['curvature']))]], columns=columns)
                 df_mean = pd.concat([df_mean, row], ignore_index = True)
 
     return([df_all, df_mean])

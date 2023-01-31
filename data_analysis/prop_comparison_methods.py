@@ -695,6 +695,38 @@ def get_prop_diff_vs_dist(df, prop = 'area', operation = 'subtract', devstage_co
 
 
 
+def compile_fit_lambdas_for_sim(diff_stat, fit_lambdas_df = None, 
+                              prop = "area", lambda_name = "lambda_isotropic_coeffs",
+                              pickle_file = None, csv_file = None,
+                             ):
+    #here we prepare a df with information about the lambda
+    #this df is then used as an input to the simulations
+    
+    #first we just get the first row of each group and take the value of the fit polynomial
+    temp_fit_lambdas_df = diff_stat.groupby(["devstage_init","devstage_final","roi"]).nth(0).reset_index()[["devstage_init", "devstage_final","roi","fit_"+prop+"_coeffs"]]
+    #add column to give name to the lambda 
+    temp_fit_lambdas_df["prop"] = lambda_name 
+    #name of lambda includes the region it belongs to 
+    temp_fit_lambdas_df["prop"] = temp_fit_lambdas_df.apply(lambda row: "inDV_"+row["prop"] if row["roi"]=="DV" else row["prop"] ,axis = 1)
+    #a string name to each transition
+    temp_fit_lambdas_df["stage_name"] = temp_fit_lambdas_df.apply(lambda row: row["devstage_init"] + " to " + row["devstage_final"], axis = 1)
+    #sort the df to give numeric name to each transition
+    #the sorting here is complex but has been done to first all stage transitions for outDV then all stage transitions for DV
+    temp_fit_lambdas_df = temp_fit_lambdas_df.sort_values(by = "devstage_final", ascending = True).sort_values(by = "roi", ascending = False)
+    #a numeric name to each transition
+    temp_fit_lambdas_df["stage"] = np.arange(len(temp_fit_lambdas_df))%(len(np.unique(temp_fit_lambdas_df["stage_name"]))) 
+    #rename and rearrange the columns so it looks more readable
+    temp_fit_lambdas_df.columns = ["stage_init", "stage_final", "roi", "value", "prop", "stage_name", "stage",]
+    temp_fit_lambdas_df = temp_fit_lambdas_df[["stage", "stage_name", "prop", "value", "stage_init", "stage_final", "roi"]].reset_index(drop = True)
 
+    #we will add the data to the fit_lambdas_df that has been passed
+    if fit_lambdas_df is None:
+        fit_lambdas_df = pd.DataFrame()
+    fit_lambdas_df = pd.concat([fit_lambdas_df, temp_fit_lambdas_df]).reset_index(drop = True)
+    
+    if pickle_file is not None: pickle.dump(pickle_file)
+    if csv_file is not None: pd.to_csv(csv_file, index = False)
+    
+    return(fit_lambdas_df)
 
     
