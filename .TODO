@@ -1,0 +1,4 @@
+-Convert "balls" to "points" or "particles"
+-To save meshes, use pyvista, save as ply, use binary=True in save function, the file size reduces significantly this way.
+-Convert project to a package - do we need to do it? - it would be convenient to have just one version of the methods.py
+

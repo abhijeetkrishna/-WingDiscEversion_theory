@@ -1,0 +1,5 @@
+thickness,nb_iterations,dt,tol_by_dt,disc_name,folder_name
+0.05,5,0.01,1e-06,20210706_ecadGFPnbG4_upcrawling_disc3_1,wd_thickness_0.05_nb_iterations_5_dt_0.01_tol_by_dt_1e-06_disc_name_20210706_ecadGFPnbG4_upcrawling_disc3_1/
+0.05,10,0.01,1e-06,20210706_ecadGFPnbG4_upcrawling_disc3_1,wd_thickness_0.05_nb_iterations_10_dt_0.01_tol_by_dt_1e-06_disc_name_20210706_ecadGFPnbG4_upcrawling_disc3_1/
+0.1,5,0.01,1e-06,20210706_ecadGFPnbG4_upcrawling_disc3_1,wd_thickness_0.1_nb_iterations_5_dt_0.01_tol_by_dt_1e-06_disc_name_20210706_ecadGFPnbG4_upcrawling_disc3_1/
+0.1,10,0.01,1e-06,20210706_ecadGFPnbG4_upcrawling_disc3_1,wd_thickness_0.1_nb_iterations_10_dt_0.01_tol_by_dt_1e-06_disc_name_20210706_ecadGFPnbG4_upcrawling_disc3_1/
