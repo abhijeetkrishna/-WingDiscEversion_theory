@@ -1,0 +1,14 @@
+matplotlib==3.5.2
+meshio==5.3.4
+meshplex==0.18.11
+meshzoo==0.9.20
+networkx==2.8.7
+numpy==1.23.1
+optimesh==0.9.8
+vtk==9.2.2
+pandas==1.4.4
+pickleshare==0.7.5
+pyvista==0.37.0
+scikit-spatial==6.5.0
+scipy==1.8.1
+x21==0.4.1

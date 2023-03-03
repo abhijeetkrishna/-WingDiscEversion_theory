@@ -1,1 +1,6 @@
 only_local/
+Environment/
+*.ipynb_checkpoints
+*.DS_Store
+.TODO
+Simulations/

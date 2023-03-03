@@ -1,0 +1,11 @@
+stage,stage_name,prop,value,stage_init,stage_final,roi
+0,wL3 to 4hAPF,lambda_isotropic_coeffs,[-0.27918239  1.43242885],wL3,4hAPF,outDV
+0,wL3 to 4hAPF,inDV_lambda_isotropic_coeffs,[-0.06107883  1.38717955],wL3,4hAPF,DV
+0,wL3 to 4hAPF,lambda_Q_coeffs,[-0.0485437   0.98414338],wL3,4hAPF,outDV
+0,wL3 to 4hAPF,inDV_lambda_Q_coeffs,[-0.06931     0.99459924],wL3,4hAPF,DV
+0,wL3 to 4hAPF,lambda_rearrangement_coeffs,[0.19174773 1.05368613],wL3,4hAPF,outDV
+0,wL3 to 4hAPF,inDV_lambda_rearrangement_coeffs,[-0.33801003  1.33804963],wL3,4hAPF,DV
+0,wL3 to 4hAPF,lambda_anisotropic_coeffs,[0.14705233 1.02209546],wL3,4hAPF,outDV
+0,wL3 to 4hAPF,inDV_lambda_anisotropic_coeffs,[-0.40920432  1.32331255],wL3,4hAPF,DV
+0,wL3 to 4hAPF,lambda_height_coeffs,[0.16550252 0.20336703 0.73390159],wL3,4hAPF,outDV
+0,wL3 to 4hAPF,inDV_lambda_height_coeffs,[-0.13366357  0.14664493  0.57795683],wL3,4hAPF,DV

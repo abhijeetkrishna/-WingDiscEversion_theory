@@ -23,7 +23,6 @@ We analyze the growth patterns in the *Drosophila* wing disc during its transfor
 - Gallery - Representative simulation results and some presentations
 - Experiments - data obtained from segmented images of wing disc (Jana Fuhrmann) and their analysis
 - Simulations - scripts to run simulations, raw data of simulations, and their analysis
-- Environment - list of all packages used and note on how to create a virtual environment
 - Publication - Plots and description for publication
 
 ## Getting Started <a name = "getting_started"></a>
@@ -33,7 +32,7 @@ Clone the repository to get a copy of the project up and running on your local m
 
 ## Prerequisites
 You need to install [OpenFPM](http://openfpm.mpi-cbg.de/) to run the simulations.
-Other packages used are mentioned in the [requirements.txt](Environment/requirements.txt) file. You can create a [virtual environment]() or just make sure that the packages on your machine are compatible with the packages mentioned in [requirements.txt](Environment/requirements.txt).
+Other packages used are mentioned in the [requirements.txt](requirements.txt) file. You can create a [virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) or just make sure that the packages on your machine are compatible with the packages mentioned in [requirements.txt](requirements.txt).
 
 ##  Authors <a name = "authors"></a>
 - Abhijeet Krishna - [krishna@mpi-cbg.de](krishna@mpi-cbg.de)
