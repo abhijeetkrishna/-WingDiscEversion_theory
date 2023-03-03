@@ -3,34 +3,34 @@ stage,stage_name,prop,value,stage_init,stage_final,roi
 1,0hAPF to 2hAPF,lambda_isotropic_coeffs,[-0.15780484  1.19114519],0hAPF,2hAPF,outDV
 2,2hAPF to 4hAPF,lambda_isotropic_coeffs,[0.02430359 1.0134246 ],2hAPF,4hAPF,outDV
 3,4hAPF to 6hAPF,lambda_isotropic_coeffs,[0.00663058 1.31914044],4hAPF,6hAPF,outDV
-0,wL3 to 0hAPF,inDV_lambda_isotropic_coeffs,[-0.11740075  1.18465332],wL3,0hAPF,DV
-1,0hAPF to 2hAPF,inDV_lambda_isotropic_coeffs,[0.00820501 0.97977026],0hAPF,2hAPF,DV
-2,2hAPF to 4hAPF,inDV_lambda_isotropic_coeffs,[0.05529701 1.19433829],2hAPF,4hAPF,DV
-3,4hAPF to 6hAPF,inDV_lambda_isotropic_coeffs,[-0.10783304  1.46038597],4hAPF,6hAPF,DV
+0,wL3 to 0hAPF,inDV_lambda_isotropic_coeffs,[-0.12128772  1.18613803],wL3,0hAPF,DV
+1,0hAPF to 2hAPF,inDV_lambda_isotropic_coeffs,[0.00859163 0.97959039],0hAPF,2hAPF,DV
+2,2hAPF to 4hAPF,inDV_lambda_isotropic_coeffs,[0.05540567 1.1943694 ],2hAPF,4hAPF,DV
+3,4hAPF to 6hAPF,inDV_lambda_isotropic_coeffs,[-0.10664339  1.45981221],4hAPF,6hAPF,DV
 0,wL3 to 0hAPF,lambda_Q_coeffs,[-0.07329242  0.99894648],wL3,0hAPF,outDV
 1,0hAPF to 2hAPF,lambda_Q_coeffs,[0.03479743 0.95988415],0hAPF,2hAPF,outDV
 2,2hAPF to 4hAPF,lambda_Q_coeffs,[0.01755614 1.01066307],2hAPF,4hAPF,outDV
 3,4hAPF to 6hAPF,lambda_Q_coeffs,[0.05579108 1.00416071],4hAPF,6hAPF,outDV
-0,wL3 to 0hAPF,inDV_lambda_Q_coeffs,[-0.03831864  1.06811464],wL3,0hAPF,DV
-1,0hAPF to 2hAPF,inDV_lambda_Q_coeffs,[-0.05442791  1.04959939],0hAPF,2hAPF,DV
-2,2hAPF to 4hAPF,inDV_lambda_Q_coeffs,[0.01240848 0.88566814],2hAPF,4hAPF,DV
-3,4hAPF to 6hAPF,inDV_lambda_Q_coeffs,[-0.1007633   1.08633802],4hAPF,6hAPF,DV
+0,wL3 to 0hAPF,inDV_lambda_Q_coeffs,[-0.03402199  1.06587274],wL3,0hAPF,DV
+1,0hAPF to 2hAPF,inDV_lambda_Q_coeffs,[-0.05890617  1.05207201],0hAPF,2hAPF,DV
+2,2hAPF to 4hAPF,inDV_lambda_Q_coeffs,[0.0099835  0.88700757],2hAPF,4hAPF,DV
+3,4hAPF to 6hAPF,inDV_lambda_Q_coeffs,[-0.1000975   1.08574241],4hAPF,6hAPF,DV
 0,wL3 to 0hAPF,lambda_rearrangement_coeffs,[0.06059088 1.03671365],wL3,0hAPF,outDV
 1,0hAPF to 2hAPF,lambda_rearrangement_coeffs,[0.09198123 0.99445852],0hAPF,2hAPF,outDV
 2,2hAPF to 4hAPF,lambda_rearrangement_coeffs,[0.03646633 1.00806809],2hAPF,4hAPF,outDV
 3,4hAPF to 6hAPF,lambda_rearrangement_coeffs,[-0.02624201  1.02766571],4hAPF,6hAPF,outDV
-0,wL3 to 0hAPF,inDV_lambda_rearrangement_coeffs,[-0.18525403  1.12009555],wL3,0hAPF,DV
-1,0hAPF to 2hAPF,inDV_lambda_rearrangement_coeffs,[-0.1043035   1.18685751],0hAPF,2hAPF,DV
-2,2hAPF to 4hAPF,inDV_lambda_rearrangement_coeffs,[-0.16309249  1.05382809],2hAPF,4hAPF,DV
-3,4hAPF to 6hAPF,inDV_lambda_rearrangement_coeffs,[0.23354132 1.32001255],4hAPF,6hAPF,DV
+0,wL3 to 0hAPF,inDV_lambda_rearrangement_coeffs,[-0.19152818  1.12357275],wL3,0hAPF,DV
+1,0hAPF to 2hAPF,inDV_lambda_rearrangement_coeffs,[-0.10515242  1.18732251],0hAPF,2hAPF,DV
+2,2hAPF to 4hAPF,inDV_lambda_rearrangement_coeffs,[-0.16290668  1.05438543],2hAPF,4hAPF,DV
+3,4hAPF to 6hAPF,inDV_lambda_rearrangement_coeffs,[0.21756353 1.32407365],4hAPF,6hAPF,DV
 0,wL3 to 0hAPF,lambda_anisotropic_coeffs,[-0.06598966  1.05217938],wL3,0hAPF,outDV
 1,0hAPF to 2hAPF,lambda_anisotropic_coeffs,[0.13906022 0.94442612],0hAPF,2hAPF,outDV
 2,2hAPF to 4hAPF,lambda_anisotropic_coeffs,[0.05613386 1.02667377],2hAPF,4hAPF,outDV
 3,4hAPF to 6hAPF,lambda_anisotropic_coeffs,[0.0143203  1.04364494],4hAPF,6hAPF,outDV
-0,wL3 to 0hAPF,inDV_lambda_anisotropic_coeffs,[-0.24699367  1.21057951],wL3,0hAPF,DV
-1,0hAPF to 2hAPF,inDV_lambda_anisotropic_coeffs,[-0.17020037  1.23743685],0hAPF,2hAPF,DV
-2,2hAPF to 4hAPF,inDV_lambda_anisotropic_coeffs,[-0.10464064  0.91088536],2hAPF,4hAPF,DV
-3,4hAPF to 6hAPF,inDV_lambda_anisotropic_coeffs,[0.14844701 1.42396482],4hAPF,6hAPF,DV
+0,wL3 to 0hAPF,inDV_lambda_anisotropic_coeffs,[-0.25008368  1.21246312],wL3,0hAPF,DV
+1,0hAPF to 2hAPF,inDV_lambda_anisotropic_coeffs,[-0.18109896  1.24318662],0hAPF,2hAPF,DV
+2,2hAPF to 4hAPF,inDV_lambda_anisotropic_coeffs,[-0.10612714  0.9116923 ],2hAPF,4hAPF,DV
+3,4hAPF to 6hAPF,inDV_lambda_anisotropic_coeffs,[0.13437978 1.42828302],4hAPF,6hAPF,DV
 0,wL3 to 0hAPF,lambda_height_coeffs,[-0.16367646  0.3552057   0.90861728],wL3,0hAPF,outDV
 1,0hAPF to 2hAPF,lambda_height_coeffs,[ 0.27631971 -0.12138084  0.8813977 ],0hAPF,2hAPF,outDV
 2,2hAPF to 4hAPF,lambda_height_coeffs,[0.00359623 0.05805373 0.91857133],2hAPF,4hAPF,outDV
