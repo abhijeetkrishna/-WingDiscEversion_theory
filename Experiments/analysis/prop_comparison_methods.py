@@ -4,6 +4,10 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import numpy as np
+from matplotlib.patches import Circle, Wedge, Rectangle, Arc
+from matplotlib.collections import PatchCollection
+import matplotlib
 
 """
 def piecewise_linear_interpolate(xs_interpolated, xs, ys):
@@ -383,7 +387,7 @@ def get_subplot(ax, df = None, stat_df = None, query_str = '', df_cases_col = 'd
 
         #ax.plot(stat_df[x_col_mean], stat_df[y_col_mean])
         if error_style == 'fill_between':
-            ax.fill_between(stat_df[x_col_mean], stat_df[y_col_mean] - yerr, stat_df[y_col_mean] + yerr, color = mean_color, alpha = mean_alpha)            
+            ax.fill_between(stat_df[x_col_mean], stat_df[y_col_mean] - yerr, stat_df[y_col_mean] + yerr, color = mean_color, alpha = mean_alpha, linewidth = 0)            
         elif error_style == 'errorbar':
             ax.errorbar(x = stat_df[x_col_mean], y = stat_df[y_col_mean], xerr = xerr, yerr = yerr, color = mean_color, lw = mean_linewidth, label = mean_label)
         ax.plot(stat_df[x_col_mean], stat_df[y_col_mean], color = mean_color, lw = mean_linewidth, label = mean_label, linestyle = mean_linestyle)
@@ -729,4 +733,159 @@ def compile_fit_lambdas_for_sim(diff_stat, fit_lambdas_df = None,
     
     return(fit_lambdas_df)
 
+def get_isotropic_subplot(ax, DV_width = 0.2, stage_init = "wL3", stage_final = "4hAPF", N = 20, zorder = 2, add_cbar = False, fit_lambdas_df = None, add_boundary = True):
+    #source : https://matplotlib.org/stable/gallery/shapes_and_collections/patch_collection.html#sphx-glr-gallery-shapes-and-collections-patch-collection-py
+    #source : https://matplotlib.org/stable/gallery/shapes_and_collections/artist_reference.html#sphx-glr-gallery-shapes-and-collections-artist-reference-py
+    #to control z order 
+    #https://matplotlib.org/stable/tutorials/colors/colors.html#sphx-glr-tutorials-colors-colors-py
+    #add each patch separately to ax and mention its zorder
+
+    patches = []
+
+    R = 1
+    w = R/N
+
+    center_bottom = (0,-DV_width/2)
+    center_top = (0,DV_width/2)
+
+    lambda_name = "lambda_isotropic_coeffs"
+    roi = "outDV"
+    query_str = 'stage_init == "' + stage_init + '" and stage_final == "' + stage_final + '" and roi == "' + roi + '" and prop == "'+ lambda_name + '"'
+    poly_obj = np.poly1d(fit_lambdas_df.query(query_str)["value"].iloc[0])
+    radii = [(N-i)*w for i in range(N)]#[(i+1)*w for i in range(N)]
+    patches = [Wedge((center_bottom), radius, 180, 360) for radius in radii] #add width = w in Wedge if you want an annulus
+    colors = [poly_obj(radius) for radius in radii]
+
+    patches += [Wedge((center_top), radius,0,180) for radius in radii]
+    colors += [poly_obj(radius) for radius in radii]
+    #zorders += [i for i in range(N)]
+
+    #adding rectangles inisde DV boundary
+    lambda_name = "inDV_" + lambda_name
+    roi = "DV"
+    query_str = '(stage_init == "' + stage_init + '") & (stage_final == "' + stage_final + '") & (roi == "' + roi + '")'
+    poly_obj = np.poly1d(fit_lambdas_df.query(query_str)["value"].iloc[0])
+    x_vals = [-(N-i)*w for i in range(N)]
+    patches += [Rectangle((x_val,-DV_width/2), 2*np.abs(x_val), DV_width) for x_val in x_vals]
+    colors += [poly_obj(np.abs(x_val)) for x_val in x_vals]
+
+    ###########
+    #colors = 100*np.random.random(len(patches))
+    norm = matplotlib.colors.Normalize(vmin=0.5, vmax=1.5)
+    p = PatchCollection(patches, cmap=matplotlib.cm.bwr, norm = norm, alpha=1, edgecolor = None, zorder = zorder)
+    p.set_array(colors)
+    ax.add_collection(p)
+    ax.set_xlim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
+    ax.set_ylim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
+    ax.set_aspect("equal")
+    ax.axis('off')
+    if add_cbar: fig.colorbar(p, ax = ax)
+    ###########
     
+    if add_boundary:
+        p = Arc(center_bottom, 2,2, theta1=180, theta2=360, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        ax.add_patch(p)
+        p = Arc(center_top, 2,2, theta1=0, theta2=180, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        ax.add_patch(p)
+        p = Rectangle((-1,center_bottom[1]), 2, DV_width, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        ax.add_patch(p)
+        
+    return(ax)
+
+
+def get_quiver_specs(R = 1, theta = 0, roi = "outDV", center = (0,0), stage_init ="wL3", stage_final = "4hAPF", lambda_name ="lambda_isotropic_coeffs", fit_lambdas_df = None):
+    
+    #from roi, get the location
+    if roi == "outDV":
+        x,y = R*np.cos(theta)+center[0], R*np.sin(theta)+center[1]
+    if roi == "DV":
+        x,y = R,theta
+    
+    #from roi get the correct lambda fit poynomial
+    query_str = 'stage_init == "' + stage_init + '" and stage_final == "' + stage_final + '" and roi == "' + roi + '" and prop == "'+lambda_name+'"'
+    poly_obj = np.poly1d(fit_lambdas_df.query(query_str)["value"].iloc[0])
+    #from the polynomial get the value
+    lambda_val = poly_obj(np.abs(R))
+    #from the value get the direction
+    if roi == "outDV" and lambda_val < 1 :
+        u = -np.abs(1 - lambda_val)*np.sin(theta)
+        v = np.abs(1 - lambda_val)*np.cos(theta)
+    if roi == "outDV" and lambda_val >= 1 :
+        u = np.abs(1 - lambda_val)*np.cos(theta)
+        v = np.abs(1 - lambda_val)*np.sin(theta)
+    if roi == "DV" and lambda_val < 1 :
+        u = 0
+        v = np.abs(1 - lambda_val)
+    if roi == "DV" and lambda_val >= 1 :
+        u = np.abs(1 - lambda_val)
+        v = 0
+    
+    return(x,y,u,v)
+
+
+def get_nematic_subplot(ax, stage_init="wL3", stage_final = "4hAPF", lambda_name ="lambda_anisotropic_coeffs", DV_width = 0.2, zorder = 10, fit_lambdas_df = None, add_boundary = True,
+                        quiver_scale = 5, quiver_width = 0.005, 
+                       ):
+    #https://stackoverflow.com/questions/34375345/how-does-pythons-matplotlib-pyplot-quiver-exactly-work
+    dtheta = 0.1
+    Rs= np.linspace(0.1,0.9, 5)#1
+    center_bottom = (0,-DV_width/2)
+    center_top = (0,DV_width/2)
+
+    x = []
+    y = []
+    u = []
+    v = []
+    
+    roi = "outDV"
+    #bottom
+    thetas = np.linspace(np.pi+dtheta, 2*np.pi-dtheta,10)
+    for R in Rs:
+        for theta in thetas:
+            x_,y_,u_,v_ = get_quiver_specs(R=R, theta=theta, roi=roi, center=center_bottom, stage_init=stage_init, stage_final=stage_final, lambda_name=lambda_name, fit_lambdas_df = fit_lambdas_df)
+            x += [x_]
+            y += [y_]
+            u += [u_]
+            v += [v_]
+
+    #top
+    thetas = np.linspace(0+dtheta, np.pi-dtheta, 10)
+    for R in Rs:
+        for theta in thetas:
+            x_,y_,u_,v_ = get_quiver_specs(R=R, theta=theta, roi=roi, center=center_top, stage_init=stage_init, stage_final=stage_final, lambda_name=lambda_name, fit_lambdas_df = fit_lambdas_df)
+            x += [x_]
+            y += [y_]
+            u += [u_]
+            v += [v_]
+
+    #DV
+    roi = "DV"
+    lambda_name ="inDV_"+lambda_name
+    x_DVs = np.linspace(-0.9, 0.9,10) #np.concatenate([Rs,-Rs])
+    for y_DV in [0]: 
+        for x_DV in x_DVs: 
+            #pass x and y values as R and theta
+            x_,y_,u_,v_ = get_quiver_specs(R=x_DV, theta=y_DV, roi=roi, center=(0,0), stage_init=stage_init, stage_final=stage_final, lambda_name=lambda_name, fit_lambdas_df = fit_lambdas_df)
+            x += [x_]
+            y += [y_]
+            u += [u_]
+            v += [v_]
+
+    #add quivers
+    ax.quiver(x,y,u,v, scale = quiver_scale, headwidth = 0, headlength = 0, headaxislength = 0, width = quiver_width, pivot = "mid", zorder = zorder) #increase scale value to decrease length of lines
+
+    if add_boundary:
+        p = Arc(center_bottom, 2,2, theta1=180, theta2=360, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        ax.add_patch(p)
+        p = Arc(center_top, 2,2, theta1=0, theta2=180, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        ax.add_patch(p)
+        p = Rectangle((-1,center_bottom[1]), 2, DV_width, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        ax.add_patch(p)
+
+    ax.set_aspect("equal")
+    ax.set_xlim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
+    ax.set_ylim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
+    ax.axis('off')
+
+    return(ax)
+
