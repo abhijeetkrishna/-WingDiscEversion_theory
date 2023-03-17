@@ -1,0 +1,2 @@
+,thickness,nb_iterations,dt,tol_by_dt,angle_of_rotation,folder_name
+11,0.1,2,0.01,1e-06,0.2,wd_thickness_0.1_nb_iterations_2_dt_0.01_tol_by_dt_1e-06_angle_of_rotation_0.2/
