@@ -385,8 +385,8 @@ def align_curves(allcurves,
                 allcurves.loc[orig_id, 'x'] = np.array(curve['x'])
                 allcurves.loc[orig_id, 'y'] = np.array(curve['y'])
 
-
-    plot_montage(allcurves, genotypes = genotypes, devstages = devstages, filename=filename, orientation = orientation)
+    if plot:
+        plot_montage(allcurves, genotypes = genotypes, devstages = devstages, filename=filename, orientation = orientation)
     
     return(allcurves)
 

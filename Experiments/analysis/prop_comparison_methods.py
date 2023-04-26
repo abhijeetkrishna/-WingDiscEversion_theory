@@ -9,6 +9,7 @@ from matplotlib.patches import Circle, Wedge, Rectangle, Arc
 from matplotlib.collections import PatchCollection
 import matplotlib
 
+
 """
 def piecewise_linear_interpolate(xs_interpolated, xs, ys):
     
@@ -78,9 +79,9 @@ def piecewise_linear_interpolate(xs_interpolated, xs, ys, manner = 'linear', inc
         i = indexes[ctr]
         x_interpolated = xs_interpolated[ctr]
         if manner == 'linear':
-        	i = i-1
+            i = i-1
         if manner == 'step-backward':
-        	i = i-1
+            i = i-1
         # if manner is step-forward then i remains i
         
         if (i >= len(xs) - 1) or (i < 0):
@@ -733,7 +734,10 @@ def compile_fit_lambdas_for_sim(diff_stat, fit_lambdas_df = None,
     
     return(fit_lambdas_df)
 
-def get_isotropic_subplot(ax, DV_width = 0.2, stage_init = "wL3", stage_final = "4hAPF", N = 20, zorder = 2, add_cbar = False, fit_lambdas_df = None, add_boundary = True):
+
+def get_isotropic_subplot(ax, DV_width = 0.2, stage_init = "wL3", stage_final = "4hAPF", N = 20, zorder = 2, add_cbar = False, fit_lambdas_df = None, add_boundary = True, boundary_lw = 1,
+                          xlim = None, ylim = None, cbar_ticks = [0.5,1,1.5], fontsize = 10, cbar_name = r"$\lambda$",
+                         ):
     #source : https://matplotlib.org/stable/gallery/shapes_and_collections/patch_collection.html#sphx-glr-gallery-shapes-and-collections-patch-collection-py
     #source : https://matplotlib.org/stable/gallery/shapes_and_collections/artist_reference.html#sphx-glr-gallery-shapes-and-collections-artist-reference-py
     #to control z order 
@@ -775,25 +779,32 @@ def get_isotropic_subplot(ax, DV_width = 0.2, stage_init = "wL3", stage_final = 
     p = PatchCollection(patches, cmap=matplotlib.cm.bwr, norm = norm, alpha=1, edgecolor = None, zorder = zorder)
     p.set_array(colors)
     ax.add_collection(p)
-    ax.set_xlim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
-    ax.set_ylim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
+    if xlim is None:
+        xlim = (-1.1*(R+DV_width), 1.1*(R+DV_width))
+    ax.set_xlim(xlim)
+    if ylim is None:
+        ylim = (-1.1*(R+DV_width), 1.1*(R+DV_width))
+    ax.set_ylim(ylim)
     ax.set_aspect("equal")
     ax.axis('off')
-    if add_cbar: fig.colorbar(p, ax = ax)
+    if add_cbar: 
+        cbar = plt.colorbar(p, ax = ax, ticks = cbar_ticks)
+        cbar.ax.set_yticklabels(labels = [str(x_) for x_ in cbar_ticks], fontsize = fontsize)  # vertically oriented colorbar
+        cbar.ax.set_ylabel(cbar_name, rotation=0, fontsize = fontsize)
     ###########
     
     if add_boundary:
-        p = Arc(center_bottom, 2,2, theta1=180, theta2=360, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        p = Arc(center_bottom, 2,2, theta1=180, theta2=360, linewidth=boundary_lw, zorder=zorder,fill = False,edgecolor="black")
         ax.add_patch(p)
-        p = Arc(center_top, 2,2, theta1=0, theta2=180, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        p = Arc(center_top, 2,2, theta1=0, theta2=180, linewidth=boundary_lw, zorder=zorder,fill = False,edgecolor="black")
         ax.add_patch(p)
-        p = Rectangle((-1,center_bottom[1]), 2, DV_width, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        p = Rectangle((-1,center_bottom[1]), 2, DV_width, linewidth=boundary_lw, zorder=zorder,fill = False,edgecolor="black")
         ax.add_patch(p)
         
     return(ax)
 
 
-def get_quiver_specs(R = 1, theta = 0, roi = "outDV", center = (0,0), stage_init ="wL3", stage_final = "4hAPF", lambda_name ="lambda_isotropic_coeffs", fit_lambdas_df = None):
+def get_quiver_specs(R = 1, theta = 0, roi = "outDV", center = (0,0), stage_init ="wL3", stage_final = "4hAPF", lambda_name ="lambda_isotropic_coeffs", fit_lambdas_df = None,):
     
     #from roi, get the location
     if roi == "outDV":
@@ -824,7 +835,8 @@ def get_quiver_specs(R = 1, theta = 0, roi = "outDV", center = (0,0), stage_init
 
 
 def get_nematic_subplot(ax, stage_init="wL3", stage_final = "4hAPF", lambda_name ="lambda_anisotropic_coeffs", DV_width = 0.2, zorder = 10, fit_lambdas_df = None, add_boundary = True,
-                        quiver_scale = 5, quiver_width = 0.005, 
+                        quiver_scale = 5, quiver_width = 0.005, boundary_lw = 1,
+                        xlim = None, ylim = None,
                        ):
     #https://stackoverflow.com/questions/34375345/how-does-pythons-matplotlib-pyplot-quiver-exactly-work
     dtheta = 0.1
@@ -875,16 +887,20 @@ def get_nematic_subplot(ax, stage_init="wL3", stage_final = "4hAPF", lambda_name
     ax.quiver(x,y,u,v, scale = quiver_scale, headwidth = 0, headlength = 0, headaxislength = 0, width = quiver_width, pivot = "mid", zorder = zorder) #increase scale value to decrease length of lines
 
     if add_boundary:
-        p = Arc(center_bottom, 2,2, theta1=180, theta2=360, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        p = Arc(center_bottom, 2,2, theta1=180, theta2=360, linewidth=boundary_lw, zorder=zorder,fill = False,edgecolor="black")
         ax.add_patch(p)
-        p = Arc(center_top, 2,2, theta1=0, theta2=180, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        p = Arc(center_top, 2,2, theta1=0, theta2=180, linewidth=boundary_lw, zorder=zorder,fill = False,edgecolor="black")
         ax.add_patch(p)
-        p = Rectangle((-1,center_bottom[1]), 2, DV_width, linewidth=1, zorder=zorder,fill = False,edgecolor="black")
+        p = Rectangle((-1,center_bottom[1]), 2, DV_width, linewidth=boundary_lw, zorder=zorder,fill = False,edgecolor="black")
         ax.add_patch(p)
 
     ax.set_aspect("equal")
-    ax.set_xlim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
-    ax.set_ylim((-1.1*(R+DV_width), 1.1*(R+DV_width)))
+    if xlim is None:
+        xlim = (-1.1*(R+DV_width), 1.1*(R+DV_width))
+    ax.set_xlim(xlim)
+    if ylim is None:
+        ylim = (-1.1*(R+DV_width), 1.1*(R+DV_width))
+    ax.set_ylim(ylim)
     ax.axis('off')
 
     return(ax)
