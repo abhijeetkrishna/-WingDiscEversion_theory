@@ -1,0 +1,9 @@
+Simulation completed with the following parameters:
+number of balls: 3186
+number of springs: 40362
+time: 0
+dt: 0.01
+mass: 1
+box dimensions: 3.94086
+running time: 883.343
+number of iterations: 858098
