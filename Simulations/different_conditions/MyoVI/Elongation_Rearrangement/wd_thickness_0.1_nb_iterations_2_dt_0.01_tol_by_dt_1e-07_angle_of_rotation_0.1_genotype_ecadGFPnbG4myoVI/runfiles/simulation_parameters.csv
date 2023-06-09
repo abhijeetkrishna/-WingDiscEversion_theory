@@ -1,0 +1,2 @@
+,thickness,nb_iterations,dt,tol_by_dt,angle_of_rotation,genotype,folder_name
+5,0.1,2,0.01,1e-07,0.1,ecadGFPnbG4myoVI,wd_thickness_0.1_nb_iterations_2_dt_0.01_tol_by_dt_1e-07_angle_of_rotation_0.1_genotype_ecadGFPnbG4myoVI/
