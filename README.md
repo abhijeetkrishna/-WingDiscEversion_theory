@@ -15,6 +15,7 @@
     <br> 
 </p>
 
+![alt text](./Gallery/Presentations/WD_teaser.png)
 
 ## About <a name = "about"></a>
 We analyze the growth patterns in the *Drosophila* wing disc during its transformation from a larva to a pupa. Growth patterns are obtained from processing segmented data from microscopic images. Using a spring lattice, we then verify whether these growth patterns can explain the 3D shape change in the wing disc.
